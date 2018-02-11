@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Main from '@/components/Main'
+import HelloWorld from '@/components/HelloWorld'
 import SignUp from '@/components/sign/Up'
 import SignCenter from '@/components/sign/Center'
 import Msg from '@/components/Msg'
@@ -13,8 +14,13 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/test',
+      name: 'test',
+      component: HelloWorld
+    },
+    {
       path: '/',
-      name: 'HelloWorld',
+      name: 'home',
       component: Main,
       children: [
         {
@@ -25,10 +31,17 @@ export default new Router({
           }
         },
         {
-          path: 'article/:id',
+          path: 'article/:id(\\d+)',
           name: 'ArticleSingle',
           components: {
             main: ArticleSingle
+          }
+        },
+        {
+          path: 'article/category/:id(\\d+)',
+          name: 'ArticleCategory',
+          components: {
+            main: Article
           }
         },
         {

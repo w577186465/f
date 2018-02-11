@@ -11,6 +11,9 @@ export default {
 </script>
 
 <style>
+html, body, #app {
+  height: 100%;
+}
 #clip_button {
   position: absolute;
   right: 10%;

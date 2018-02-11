@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
-      <img src="../assets/upload.png" alt="" id="img">
-      <input type="file" accept="image/png,image/jpg,image/jpeg" @change="change($event)">
+      <button @click="add">添加普通会员</button>
+      <button @click="login">登录</button>
   </div>
 </template>
 
@@ -13,12 +13,13 @@ export default {
     }
   },
   methods: {
-    change (event) {
-      let image = document.getElementById('img') // 预览对象
-      this.clip(event, {
-        resultObj: image,
-        aspectRatio: 1
+    add () {
+      this.axios.post('/server/api/member/add', {
+        openid: 'asdf'
       })
+    },
+    login () {
+      window.localStorage.openid = 'asdf'
     }
   }
 }

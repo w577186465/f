@@ -51,7 +51,23 @@ export default {
       addressData: ChinaAddressV4Data
     }
   },
+  created: function () {
+    this.get()
+  },
   methods: {
+    get: function () {
+      var openid = window.localStorage.getItem('openid')
+      this.axios.get('/server/api/member/' + openid)
+        .then((res) => {
+          if (res.data.data.name == '') {
+            this.$router.push({ name: 'SingUp'})
+          }
+          this.info = res.data.data
+        })
+        .catch((err) => {
+          this.errHandle(err)
+        })
+    },
     change (event) {
       let image = document.getElementById('img') // 预览对象
       this.clip(event, {
