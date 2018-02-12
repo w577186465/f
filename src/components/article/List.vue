@@ -45,7 +45,7 @@ export default {
         })
     },
     to: function (to) {
-      this.$router.push({ name: 'ArticleSingle', to})
+      this.$router.push({ name: 'ArticleSingle', to })
     }
   }
 }

@@ -11,7 +11,7 @@ import NoPermission from '@/components/article/NoPermission'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/test',
@@ -47,6 +47,9 @@ export default new Router({
         {
           path: 'sign-up',
           name: 'SingUp',
+          meta: {
+            requireAuth: true
+          },
           components: {
             main: SignUp
           }
@@ -54,6 +57,9 @@ export default new Router({
         {
           path: 'sign/center',
           name: 'SignCenter',
+          meta: {
+            requireAuth: true
+          },
           components: {
             main: SignCenter
           }
@@ -74,3 +80,24 @@ export default new Router({
     }
   ]
 })
+
+var openid = window.localStorage.getItem('openid')
+Vue.prototype.openid = openid
+
+// if (window.localStorage.getItem('token')) {
+//   store.dispatch('login', window.localStorage.getItem('token'))
+// }
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
+    if (openid) { // 通过vuex state获取当前的token是否存在
+      next()
+    } else {
+      window.location.href = 'http://baidu.com'
+    }
+  } else {
+    next()
+  }
+})
+
+export default router

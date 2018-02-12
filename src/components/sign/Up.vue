@@ -2,7 +2,7 @@
   <div>
     <div class="avatar">
       <div class="avatar-box" @click.stop.prevent="uploadClick">
-        <img src="static/avatar-default.jpg" alt="" id="img">
+        <img :src="info.avatar" alt="" id="img">
       </div>
       <input type="file" ref="upload" style="display: none;" accept="image/png,image/jpg,image/jpeg" @change="avatar_add">
     </div>
@@ -10,16 +10,17 @@
       <x-input title="姓名" v-model="info.name"></x-input>
     </group>
     <group>
-      <selector title="性别" v-model="info.gender" :options="[{key: '1', value: '男'}, {key: '0', value: '女'}]"></selector>
+      <selector title="性别" v-model="info.sex" :options="[{key: '1', value: '男'}, {key: '0', value: '女'}]"></selector>
     </group>
     <group>
       <x-input title="手机" keyboard="number" is-type="china-mobile" v-model="info.tel" mask></x-input>
     </group>
     <group>
-      <x-address title="住址" :list="addressData" v-model="info.address"></x-address>
+      <x-address title="住址" :list="addressData" v-model="info.region"></x-address>
+      <x-input title="具体地址" v-model="info.adress"></x-input>
     </group>
     <group>
-      <x-input title="身份证号" v-model="info.idnum"></x-input>
+      <x-input title="身份证号" v-model="info.certnumber"></x-input>
     </group>
 
     <div class="submit-btn">
@@ -37,8 +38,8 @@
         :fixedBox="CropopOption.fixedBox"
       ></vueCropper>
       <div class="handle">
-        <x-button type="warn" @click.native="submit">取消</x-button>
-        <x-button type="primary" @click.native="submit">确认</x-button>
+        <x-button type="warn" @click.native="avatar_upload">取消</x-button>
+        <x-button type="primary" @click.native="avatar_upload">确认</x-button>
       </div>
     </div>
     
@@ -66,7 +67,10 @@ export default {
           url: 'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3421141554,1910839773&fm=58'
         }
       ],
-      info: {},
+      info: {
+        openid: this.openid,
+        avatar: 'static/avatar-default.jpg'
+      },
 
       // 裁剪图片
       CropperDialog: false,
@@ -80,6 +84,21 @@ export default {
       addressData: ChinaAddressV4Data
     }
   },
+  created: function () {
+    this.axios.get('/server/api/member/' + this.openid)
+      .then((res) => {
+        this.$vux.alert.show({
+          title: '您已提交过申请',
+          content: '如需修改信息，请在此页修改'
+        })
+        if (res.data.data.name !== '') {
+          this.$router.push({ name: 'SignCenter' })
+        }
+      })
+      .catch((err) => {
+        this.errHandle(err)
+      })
+  },
   methods: {
     avatar_add: function (e) {
       var file = e.target.files[0]
@@ -90,22 +109,21 @@ export default {
     },
     avatar_upload: function () { // 上传缩略图
       this.$refs.cropper.getCropData((data) => {
-        var blob = this.$libs.dataURLtoBlob(data)
+        var blob = this.dataURLtoBlob(data)
 
         let postData = new FormData()
         postData.append('file', blob)
 
-        this.axios.post('/server/api/admin/uploader', postData)
+        this.axios.post('/server/api/uploader', postData)
           .then((res) => {
             this.CropperDialog = false
-            this.addData.thumb = res.data.data
+            this.info.avatar = res.data.data
           })
           .catch((err) => {
             this.errHandle(err)
           })
       })
     },
-    
     imageuploaded: function (res) {
       if (res.errcode === 0) {
         if (res.data.src) {
@@ -128,25 +146,15 @@ export default {
     submit: function () {
       this.axios.post('/server/api/member/signup', this.info)
         .then((res) => {
-          console.log(res.data.data)
+          this.$vux.alert.show({
+            title: '操作成功',
+            content: '您的信息已成功提交，请等待审核'
+          })
+          this.$router.push({name: 'SignCenter'})
         })
-      // this.Msg = {
-      //   title: '操作成功！',
-      //   description: 'msg description',
-      //   icon: 'success',
-      //   buttons: [{
-      //     type: 'primary',
-      //     text: '进入会员中心',
-      //     onClick: this.to.bind(this, {name: 'SignCenter'})
-      //   }, {
-      //     type: 'default',
-      //     text: '继续浏览内容'
-      //   }]
-      // }
-
-      // this.Msg.title = '操作成功！'
-      // alert(this.Msg.title)
-      // this.to({name: 'Msg'})
+        .catch((err) => {
+          this.errHandle(err)
+        })
     },
     uploadClick: function () {
       this.$refs.upload.click()
