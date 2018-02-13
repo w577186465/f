@@ -6,8 +6,12 @@
       </div>
       <input type="file" ref="upload" style="display: none;" accept="image/png,image/jpg,image/jpeg" @change="avatar_add">
     </div>
+    <group v-if="info.status !== 1 && info.status !== 0" class="status">
+      <p v-if="info.status === 2" class="warn">您的账号尚处于审核状态，请耐心等待。</p>
+      <p v-else-if="info.status === -1" class="error">您的申请被驳回，请修改信息后申请。</p>
+    </group>
     <group>
-      <x-input title="姓名" v-model="info.name"></x-input>
+      <x-input title="姓名" v-model="info.name" disabled></x-input>
     </group>
     <group>
       <selector title="性别" v-model="info.sex" :options="[{key: '1', value: '男'}, {key: '0', value: '女'}]"></selector>
@@ -16,11 +20,11 @@
       <x-input title="手机" keyboard="number" is-type="china-mobile" v-model="info.tel" mask></x-input>
     </group>
     <group>
-      <x-address title="地址" :list="addressData" :raw-value="false" placeholder="辽宁省" v-model="info.region"></x-address>
+      <x-address title="地址" :list="addressData" :raw-value="true" :placeholder="info.regiondesc" v-model="region"></x-address>
       <x-input title="具体地址" v-model="info.adress"></x-input>
     </group>
     <group>
-      <x-input title="身份证号" v-model="info.certnumber"></x-input>
+      <x-input title="身份证号" v-model="info.certnumber" disabled></x-input>
     </group>
 
     <div class="submit-btn">
@@ -67,6 +71,7 @@ export default {
         }
       ],
       info: {},
+      region: [],
 
       // 裁剪图片
       CropperDialog: false,
@@ -85,23 +90,24 @@ export default {
     this.get()
   },
   watch: {
-    'info.region': function (val) {
-      console.log(val)
-    }
   },
   methods: {
     get: function () {
       var openid = window.localStorage.getItem('openid')
       this.axios.get('/server/api/member/' + openid)
         .then((res) => {
-          if (res.data.data.name === '') {
+          if (res.data.data.status === 0) {
+            this.$vux.alert.show({
+              title: '您还没有录入信息',
+              content: '请填写如下信息，即可成为高级会员'
+            })
             this.$router.push({ name: 'SingUp' })
           }
-          const info = res.data.data
-          const region = parseInt(info.region)
-          const province = parseInt(region / 10000) * 10000 // 省
-          const city = parseInt(region / 100) * 100 // 市
-          info.region = [province, city, region]
+          var info = res.data.data
+          var region = parseInt(info.region)
+          var province = parseInt(region / 10000) * 10000 // 省
+          var city = parseInt(region / 100) * 100 // 市
+          this.region = info.region = [province, city, region]
           this.info = info
         })
         .catch((err) => {
@@ -140,7 +146,44 @@ export default {
     to: function (r) {
       this.$router.push(r)
     },
+
+    // 城市submit转换
+    region_desc: function (code) {
+      var data = ''
+      for (var v of code) {
+        if (v === code[0]) {
+          data += this.region_find(v)
+        } else {
+          data += ' ' + this.region_find(v)
+        }
+      }
+      return data
+    },
+    region_find: function (code) {
+      for (var v of this.addressData) {
+        if (v.value === code) {
+          return v.name
+        }
+      }
+
+      return null
+    },
+
     submit: function () {
+      if (this.region.length === 0) {
+        this.$vux.alert.show({
+          title: '操作失败',
+          content: '请选择地区'
+        })
+        return
+      }
+      var desc = this.region_desc(this.region)
+      var region = this.region
+      this.info.province = region[0]
+      this.info.city = region[1]
+      this.info.region = region[2]
+      this.info.regiondesc = desc
+
       this.axios.post('/server/api/member/signup', this.info)
         .then((res) => {
           this.$vux.alert.show({
@@ -149,7 +192,7 @@ export default {
           })
         })
         .catch((err) => {
-          this.errHandle(err)
+          this.errHandle(err, '请检查您的信息')
         })
     },
     previewMethod: function () {
@@ -211,5 +254,22 @@ export default {
 
 .submit-btn {
   padding: 20px 15px;
+}
+
+.status {
+  p {
+    font-size: 14px;
+    color: #fff;
+    line-height: 24px;
+    padding: 10px 15px;
+  }
+
+  .warn {
+    background-color: #f58700;
+  }
+
+  .error {
+    background-color: #ff5050;
+  }
 }
 </style>

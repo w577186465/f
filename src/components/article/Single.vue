@@ -34,7 +34,17 @@ export default {
     get: function () {
       this.axios.get('/server/api/article/' + this.id)
         .then((res) => {
+          if (res.data.status === 401) {
+            this.$vux.alert.show({
+              title: '权限不足',
+              content: '该文章只有高级会员可浏览，请先申请高级会员。'
+            })
+            this.$router.push({name: 'SingUp'})
+          }
           this.data = res.data.data
+        })
+        .catch((err) => {
+          this.errHandle(err)
         })
     }
   }
@@ -64,5 +74,10 @@ export default {
   }
 }
 
+/deep/ {
+  .ql-align-center {
+    text-align: center;
+  }
+}
 
 </style>

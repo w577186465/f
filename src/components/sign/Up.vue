@@ -8,19 +8,15 @@
     </div>
     <group>
       <x-input title="姓名" v-model="info.name"></x-input>
-    </group>
-    <group>
       <selector title="性别" v-model="info.sex" :options="[{key: '1', value: '男'}, {key: '0', value: '女'}]"></selector>
+      <x-input title="身份证号" v-model="info.certnumber"></x-input>
     </group>
     <group>
       <x-input title="手机" keyboard="number" is-type="china-mobile" v-model="info.tel" mask></x-input>
     </group>
     <group>
-      <x-address title="住址" :list="addressData" v-model="info.region"></x-address>
+      <x-address title="地址" :list="addressData" v-model="region"></x-address>
       <x-input title="具体地址" v-model="info.adress"></x-input>
-    </group>
-    <group>
-      <x-input title="身份证号" v-model="info.certnumber"></x-input>
     </group>
 
     <div class="submit-btn">
@@ -71,6 +67,7 @@ export default {
         openid: this.openid,
         avatar: 'static/avatar-default.jpg'
       },
+      region: [],
 
       // 裁剪图片
       CropperDialog: false,
@@ -87,11 +84,7 @@ export default {
   created: function () {
     this.axios.get('/server/api/member/' + this.openid)
       .then((res) => {
-        this.$vux.alert.show({
-          title: '您已提交过申请',
-          content: '如需修改信息，请在此页修改'
-        })
-        if (res.data.data.name !== '') {
+        if (res.data.data.status !== 0) {
           this.$router.push({ name: 'SignCenter' })
         }
       })
@@ -124,26 +117,46 @@ export default {
           })
       })
     },
-    imageuploaded: function (res) {
-      if (res.errcode === 0) {
-        if (res.data.src) {
-          this.src = res.data.src
-          return
-        }
-        this.name = res.data.name
-        this.cropArgs = {
-          toCropImgH: parseInt(res.data.post.toCropImgH),
-          toCropImgW: parseInt(res.data.post.toCropImgW),
-          toCropImgX: parseInt(res.data.post.toCropImgX),
-          toCropImgY: parseInt(res.data.post.toCropImgY)
-        }
-        this.cropSrc = 'http://img1.vued.vanthink.cn/vued41b900045d6d44f3b32e06049621b415.png'
-      }
-    },
     to: function (r) {
       this.$router.push(r)
     },
+    // 城市submit转换
+    region_desc: function (code) {
+      var data = ''
+      for (var v of code) {
+        if (v === code[0]) {
+          data += this.region_find(v)
+        } else {
+          data += ' ' + this.region_find(v)
+        }
+      }
+      return data
+    },
+    region_find: function (code) {
+      for (var v of this.addressData) {
+        if (v.value === code) {
+          return v.name
+        }
+      }
+
+      return null
+    },
+
     submit: function () {
+      if (this.region.length === 0) {
+        this.$vux.alert.show({
+          title: '操作失败',
+          content: '请选择地区'
+        })
+        return
+      }
+      var desc = this.region_desc(this.region)
+      var region = this.region
+      this.info.province = region[0]
+      this.info.city = region[1]
+      this.info.region = region[2]
+      this.info.regiondesc = desc
+
       this.axios.post('/server/api/member/signup', this.info)
         .then((res) => {
           this.$vux.alert.show({
@@ -153,7 +166,7 @@ export default {
           this.$router.push({name: 'SignCenter'})
         })
         .catch((err) => {
-          this.errHandle(err)
+          this.errHandle(err, '请检查信息是否填写完整。')
         })
     },
     uploadClick: function () {

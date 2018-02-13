@@ -84,16 +84,12 @@ const router = new Router({
 var openid = window.localStorage.getItem('openid')
 Vue.prototype.openid = openid
 
-// if (window.localStorage.getItem('token')) {
-//   store.dispatch('login', window.localStorage.getItem('token'))
-// }
-
 router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
     if (openid) { // 通过vuex state获取当前的token是否存在
       next()
     } else {
-      window.location.href = 'http://baidu.com'
+      window.location.href = 'http://syhjzd.weixin.dlwanglong.com/server/login'
     }
   } else {
     next()

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <card v-for="v in data.article.data" @on-click-header="to({ id: v.id })">
+    <card v-for="v in data.article.data" :key="v.id" @on-click-header="to({ id: v.id })">
       <img slot="header" :src="v.thumb" style="width:100%;display:block;">
       <div slot="footer" class="card-padding" @click="to({ id: v.id })">
         <p style="color:#999;font-size:12px;">发布时间：{{v.updated_at}}</p>
@@ -45,7 +45,7 @@ export default {
         })
     },
     to: function (to) {
-      this.$router.push({ name: 'ArticleSingle', to })
+      this.$router.push({ name: 'ArticleSingle', params: to })
     }
   }
 }
