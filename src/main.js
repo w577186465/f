@@ -6,7 +6,6 @@ import router from './router'
 import axios from './http'
 import App from './App'
 import Global from './global'
-import clipper from '../static/clipper'
 import {
   Group,
   XInput,
@@ -18,9 +17,6 @@ Vue.use(XInput)
 Vue.use(AlertPlugin)
 
 Vue.prototype.axios = axios
-
-// 图片裁剪
-Vue.use(clipper)
 
 // 全局变量
 Vue.prototype.Msg = Global.Msg

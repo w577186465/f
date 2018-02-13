@@ -89,7 +89,8 @@ router.beforeEach((to, from, next) => {
     if (openid) { // 通过vuex state获取当前的token是否存在
       next()
     } else {
-      window.location.href = 'http://syhjzd.weixin.dlwanglong.com/server/login'
+      alert('nologin')
+      window.location.href = '/server/login'
     }
   } else {
     next()

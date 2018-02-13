@@ -1,5 +1,5 @@
 import axios from 'axios'
-import router from './router'
+// import router from './router'
 
 var wxtoken = window.localStorage.getItem('wxtoken')
 
@@ -25,11 +25,10 @@ axios.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // 返回 401 清除token信息并跳转到登录页面
-          window.localStorage.removeItem('wxtoken')
+          alert('ssdfsdfds')
           window.localStorage.removeItem('openid')
-          window.localStorage.wxtoken = null
           window.localStorage.openid = null
-          window.location.href = 'http://syhjzd.weixin.dlwanglong.com/server/login'
+          // window.location.href = '/server/login'
       }
     }
     return Promise.reject(error.response) // 返回接口返回的错误信息
