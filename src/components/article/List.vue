@@ -40,7 +40,6 @@ export default {
       var catid = this.$route.params.id
       this.axios.get('/server/api/article', { params: { 'catid': catid } })
         .then((res) => {
-          console.log(res.data.data)
           this.data = res.data.data
         })
     },

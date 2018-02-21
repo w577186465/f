@@ -17,7 +17,7 @@
       <selector title="性别" v-model="info.sex" :options="[{key: '1', value: '男'}, {key: '0', value: '女'}]"></selector>
     </group>
     <group>
-      <x-input title="手机" keyboard="number" is-type="china-mobile" v-model="info.tel" mask></x-input>
+      <x-input title="手机" keyboard="number" is-type="china-mobile" v-model="info.tel + ''" mask></x-input>
     </group>
     <group>
       <x-address title="地址" :list="addressData" :raw-value="true" :placeholder="info.regiondesc" v-model="region"></x-address>
@@ -65,11 +65,6 @@ export default {
   },
   data () {
     return {
-      images: [
-        {
-          url: 'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3421141554,1910839773&fm=58'
-        }
-      ],
       info: {},
       region: [],
 
@@ -78,8 +73,8 @@ export default {
       CropopOption: {
         img: '',
         autoCrop: true,
-        autoCropWidth: 300,
-        autoCropHeight: 300,
+        autoCropWidth: 200,
+        autoCropHeight: 200,
         fixedBox: true
       },
 
@@ -88,8 +83,6 @@ export default {
   },
   created: function () {
     this.get()
-  },
-  watch: {
   },
   methods: {
     get: function () {

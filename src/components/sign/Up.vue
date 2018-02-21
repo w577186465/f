@@ -74,8 +74,8 @@ export default {
       CropopOption: {
         img: '',
         autoCrop: true,
-        autoCropWidth: 300,
-        autoCropHeight: 300,
+        autoCropWidth: 200,
+        autoCropHeight: 200,
         fixedBox: true
       },
       addressData: ChinaAddressV4Data

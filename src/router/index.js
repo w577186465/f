@@ -4,10 +4,8 @@ import Main from '@/components/Main'
 import HelloWorld from '@/components/HelloWorld'
 import SignUp from '@/components/sign/Up'
 import SignCenter from '@/components/sign/Center'
-import Msg from '@/components/Msg'
 import Article from '@/components/article/List'
 import ArticleSingle from '@/components/article/Single'
-import NoPermission from '@/components/article/NoPermission'
 
 Vue.use(Router)
 
@@ -63,20 +61,8 @@ const router = new Router({
           components: {
             main: SignCenter
           }
-        },
-        {
-          path: 'msg',
-          name: 'Msg',
-          components: {
-            main: Msg
-          }
         }
       ]
-    },
-    {
-      path: '/article/nopermission',
-      name: 'NoPermission',
-      component: NoPermission
     }
   ]
 })
@@ -90,7 +76,7 @@ router.beforeEach((to, from, next) => {
       next()
     } else {
       alert('nologin')
-      window.location.href = '/server/login'
+      window.location.href = '/server/api/login'
     }
   } else {
     next()
